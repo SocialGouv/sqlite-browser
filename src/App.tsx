@@ -1,4 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, {
+  KeyboardEventHandler,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import "./App.css";
 
 import initSQL, {
@@ -15,7 +20,7 @@ const useSqlite = (): [null | Database] => {
       initSQL({
         locateFile: (file) => `https://sql.js.org/dist/${file}`,
       }),
-      await fetch("/PS_LibreAcces5.sqlite").then((res) => res.arrayBuffer()),
+      await fetch("/PS_LibreAcces.sqlite").then((res) => res.arrayBuffer()),
     ]);
     const db = new SQL.Database(new Uint8Array(buf));
     return db;
@@ -85,24 +90,35 @@ const usePagination = ({
 };
 
 const Table = ({ db, name }: { db: Database; name: string }) => {
+  const [query, setQuery] = useState(`SELECT * from ${name}`);
   const { columns, rows, pagination, setOffset } = usePagination({
     db,
     table: name,
-    query: `SELECT * from ${name}`,
+    query: query,
   });
-  console.log("Table", { columns, rows, pagination, setOffset });
+
   const nextPage = () => {
     setOffset(pagination.offset + rows.length);
   };
+
   const prevPage = () => {
     setOffset(
       Math.max(0, pagination.offset - Math.min(pagination.limit, rows.length))
     );
   };
+
+  const onInputChange = (e: any) => {
+    setQuery(
+      `SELECT * from ${name} where "Nom d'exercice" like '%${e.target.value}%' or "Prénom d'exercice" like '%${e.target.value}%'`
+    );
+  };
+
   return (
     columns && (
       <div>
-        <h3>{name}</h3>
+        <h3>
+          {name} ({pagination.total})
+        </h3>
         {pagination && (
           <>
             <button onClick={prevPage} disabled={!pagination.offset}>
@@ -115,6 +131,7 @@ const Table = ({ db, name }: { db: Database; name: string }) => {
             >
               next
             </button>
+            <input onChange={onInputChange} />
           </>
         )}
         <table>
@@ -149,7 +166,7 @@ function App() {
         .exec(
           "SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';"
         )
-        .map((row) => row.values[0].toString())) ||
+        .flatMap((row) => row.values.map((val) => val.toString()))) ||
     [];
 
   return (
