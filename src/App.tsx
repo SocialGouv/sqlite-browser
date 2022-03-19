@@ -16,6 +16,7 @@ import internal from "stream";
 const useSqlite = (): [null | Database] => {
   const [db, setDb] = useState(null);
   const initDb = async () => {
+    console.log("initDb");
     const [SQL, buf] = await Promise.all([
       initSQL({
         locateFile: (file) => `https://sql.js.org/dist/${file}`,
@@ -26,7 +27,13 @@ const useSqlite = (): [null | Database] => {
     return db;
   };
   useEffect(() => {
-    initDb().then((db: any) => setDb(db));
+    //@ts-expect-error
+    initDb().then((db: Database) => setDb(db));
+    return () => {
+      console.log("close db");
+      //@ts-expect-error
+      db && db.close();
+    };
   }, []);
   return [db];
 };
@@ -43,7 +50,7 @@ const useSelect = (
     }
     const res = db.exec(query) as any;
     setResult(res[0]);
-  }, [query]);
+  }, [query, db]);
   return [result];
 };
 
@@ -79,7 +86,7 @@ const usePagination = ({
 
   useEffect(() => {
     setPaginatedQuery(`${query} LIMIT ${limit} OFFSET ${offset}` as any);
-  }, [query, offset]);
+  }, [query, offset, limit]);
 
   return {
     columns: columnsResult?.columns || [],
@@ -115,9 +122,9 @@ const Table = ({ db, name }: { db: Database; name: string }) => {
 
   return (
     columns && (
-      <div>
+      <div style={{ width: "90vw", margin: "0 5vw" }}>
         <h3>
-          {name} ({pagination.total})
+          {name} ({Intl.NumberFormat().format(pagination.total)})
         </h3>
         {pagination && (
           <>
@@ -131,7 +138,11 @@ const Table = ({ db, name }: { db: Database; name: string }) => {
             >
               next
             </button>
-            <input onChange={onInputChange} />
+            <input
+              placeholder="rechercher...."
+              style={{ width: 300, display: "inline-block" }}
+              onChange={onInputChange}
+            />
           </>
         )}
         <table>
