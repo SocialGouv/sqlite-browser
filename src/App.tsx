@@ -3,8 +3,12 @@ import React, {
   useCallback,
   useEffect,
   useState,
+  useMemo,
+  ReactElement,
 } from "react";
 import "./App.css";
+
+import { useDropzone } from "react-dropzone";
 
 import initSQL, {
   Database,
@@ -13,15 +17,14 @@ import initSQL, {
 } from "sql.js/dist/sql-asm-memory-growth";
 import internal from "stream";
 
-const useSqlite = (): [null | Database] => {
+const useSqlite = (source: Promise<any>): [null | Database] => {
   const [db, setDb] = useState(null);
   const initDb = async () => {
-    console.log("initDb");
     const [SQL, buf] = await Promise.all([
       initSQL({
         locateFile: (file) => `https://sql.js.org/dist/${file}`,
       }),
-      await fetch("/PS_LibreAcces.sqlite").then((res) => res.arrayBuffer()),
+      await source,
     ]);
     const db = new SQL.Database(new Uint8Array(buf));
     return db;
@@ -96,6 +99,51 @@ const usePagination = ({
   };
 };
 
+//import styles from "./csv.module.css";
+
+export const DropZone = ({
+  onDrop,
+  status,
+}: {
+  onDrop: any;
+  status?: string;
+}) => {
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+    isDragAccept,
+    isDragReject,
+  } = useDropzone({
+    onDrop,
+    //accept: "text/sqlite",
+  });
+
+  const acceptStyle = {
+    borderColor: "#00e676",
+  };
+
+  const rejectStyle = {
+    borderColor: "#ff1744",
+  };
+
+  const style = useMemo(
+    () => ({
+      ...(isDragActive ? acceptStyle : {}),
+      ...(isDragAccept ? acceptStyle : {}),
+      ...(isDragReject ? rejectStyle : {}),
+    }),
+    [isDragActive, isDragReject, isDragAccept]
+  );
+
+  return (
+    <div {...getRootProps({ style })} className={"dropZone"}>
+      <input {...getInputProps()} />
+      <p>{status || "Glissez un fichier SQLITE ici"}</p>
+    </div>
+  );
+};
+
 const Table = ({ db, name }: { db: Database; name: string }) => {
   const [query, setQuery] = useState(`SELECT * from ${name}`);
   const { columns, rows, pagination, setOffset } = usePagination({
@@ -109,9 +157,7 @@ const Table = ({ db, name }: { db: Database; name: string }) => {
   };
 
   const prevPage = () => {
-    setOffset(
-      Math.max(0, pagination.offset - Math.min(pagination.limit, rows.length))
-    );
+    setOffset(Math.max(0, pagination.offset - pagination.limit));
   };
 
   const onInputChange = (e: any) => {
@@ -134,7 +180,7 @@ const Table = ({ db, name }: { db: Database; name: string }) => {
 
             <button
               onClick={nextPage}
-              disabled={pagination.offset + rows.length > pagination.total}
+              disabled={pagination.offset + pagination.limit > pagination.total}
             >
               next
             </button>
@@ -169,8 +215,8 @@ const Table = ({ db, name }: { db: Database; name: string }) => {
   );
 };
 
-function App() {
-  const [db] = useSqlite();
+const Sqlite = ({ source }: { source: Promise<any> }) => {
+  const [db] = useSqlite(source);
   const tables =
     (db &&
       db
@@ -179,10 +225,80 @@ function App() {
         )
         .flatMap((row) => row.values.map((val) => val.toString()))) ||
     [];
+  return (
+    db &&
+    tables && (
+      <>
+        {tables.map((table) => (
+          <Table key={table} db={db} name={table} />
+        ))}
+      </>
+    )
+  );
+};
 
+interface Db {
+  name: string;
+  source: any;
+}
+
+function App() {
+  const [dbs, setDbs] = useState<Db[]>([]);
+  const addDb = (db: Db) => {
+    setDbs([...dbs, db]);
+  };
+
+  const [progress, setProgress] = useState({ status: "", msg: "" });
+  const reset = () => {
+    setProgress({ status: "", msg: "" });
+  };
+  const onDrop = useCallback((acceptedFiles) => {
+    reset();
+    if (acceptedFiles.length) {
+      setProgress({
+        status: "running",
+        msg: "Démarrage...",
+      });
+      const reader = new FileReader();
+      const acceptedFile = acceptedFiles[0];
+      reader.onload = async (e) => {
+        //@ts-expect-error
+        const resultBuffer = Buffer.from(e.target.result);
+        addDb({
+          name: acceptedFile.name,
+          source: resultBuffer,
+        });
+      };
+
+      // setTimeout(() => {
+
+      reader.readAsArrayBuffer(acceptedFile);
+    } else {
+      setProgress({
+        status: "error",
+        msg: `Aucun fichier détecté`,
+      });
+      reset();
+    }
+  }, []);
+
+  const addExample = () => {
+    addDb({
+      name: "example",
+      source: fetch("/PS_LibreAcces.sqlite").then((res) => res.arrayBuffer()),
+    });
+  };
   return (
     <div className="App">
-      {db && tables.map((table) => <Table key={table} db={db} name={table} />)}
+      <button onClick={addExample}>Load big example</button>
+      <DropZone onDrop={onDrop} status={progress.msg} />
+      {dbs.map((db, index) => (
+        <div key={db.name}>
+          <h2>{db.name}</h2>
+          <Sqlite source={db.source} />
+        </div>
+      ))}
+      {/*db && tables.map((table) => <Table key={table} db={db} name={table} />)*/}
     </div>
   );
 }
