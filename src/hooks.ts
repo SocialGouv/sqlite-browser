@@ -61,25 +61,29 @@ export const usePagination = ({
 
 export const useSqlite = (source: Promise<any>): [null | Database] => {
   const [db, setDb] = useState(null);
-  const initDb = useCallback(async () => {
+  const initDb = useCallback(async (source) => {
     const [SQL, buf] = await Promise.all([
       initSQL({
         locateFile: (file) => `https://sql.js.org/dist/${file}`,
       }),
       await source,
     ]);
-    const db = new SQL.Database(new Uint8Array(buf));
-    return db;
-  }, [source]);
-  useEffect(() => {
+    const loadDb = new SQL.Database(new Uint8Array(buf));
     //@ts-expect-error
-    initDb().then((db: Database) => setDb(db));
+    setDb(loadDb);
+    console.log("set db", loadDb);
+  }, []);
+  useEffect(() => {
+    if (db) {
+      return;
+    }
+    initDb(source);
     return () => {
       console.log("close db");
       //@ts-expect-error
       db && db.close();
     };
-  }, [initDb, db]);
+  }, [initDb, source, db]);
   return [db];
 };
 

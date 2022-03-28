@@ -21,7 +21,7 @@ const Query = ({ db }: { db: SqliteDatabase }) => {
     <div>
       <Form.Control
         value={query}
-        onChange={(e) => setTimeout(() => setQuery(e.target.value), 0)}
+        onChange={(e) => setQuery(e.target.value)}
         as="textarea"
         rows={2}
         placeholder="select * from album;"
@@ -41,7 +41,7 @@ const Query = ({ db }: { db: SqliteDatabase }) => {
 export const Database = ({ source }: { source: Promise<any> }) => {
   const [db] = useSqlite(source);
   const tables = useMemo(() => getTables(db), [db]);
-
+  console.log("Database");
   return (
     (db && tables && tables.length && (
       <Tabs defaultActiveKey={tables[0]} className="mb-3">
