@@ -41,7 +41,6 @@ const Query = ({ db }: { db: SqliteDatabase }) => {
 export const Database = ({ source }: { source: Promise<any> }) => {
   const [db] = useSqlite(source);
   const tables = useMemo(() => getTables(db), [db]);
-  console.log("Database");
   return (
     (db && tables && tables.length && (
       <Tabs defaultActiveKey={tables[0]} className="mb-3">

@@ -71,7 +71,6 @@ export const useSqlite = (source: Promise<any>): [null | Database] => {
     const loadDb = new SQL.Database(new Uint8Array(buf));
     //@ts-expect-error
     setDb(loadDb);
-    console.log("set db", loadDb);
   }, []);
   useEffect(() => {
     if (db) {
