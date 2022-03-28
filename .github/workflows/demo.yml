@@ -6,6 +6,10 @@ on:
     branches:
       - master
 
+concurrency:
+  cancel-in-progress: true
+  group: demo
+
 jobs:
   demo:
     name: Demo
