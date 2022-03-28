@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/sqlite-browser/static/css/main.9e53b558.chunk.css",
+    "main.js": "/sqlite-browser/static/js/main.1fd7ca9f.chunk.js",
+    "main.js.map": "/sqlite-browser/static/js/main.1fd7ca9f.chunk.js.map",
+    "runtime-main.js": "/sqlite-browser/static/js/runtime-main.3aa61d16.js",
+    "runtime-main.js.map": "/sqlite-browser/static/js/runtime-main.3aa61d16.js.map",
+    "static/css/2.8c0e6b67.chunk.css": "/sqlite-browser/static/css/2.8c0e6b67.chunk.css",
+    "static/js/2.27ca0054.chunk.js": "/sqlite-browser/static/js/2.27ca0054.chunk.js",
+    "static/js/2.27ca0054.chunk.js.map": "/sqlite-browser/static/js/2.27ca0054.chunk.js.map",
+    "static/js/3.a0a941b6.chunk.js": "/sqlite-browser/static/js/3.a0a941b6.chunk.js",
+    "static/js/3.a0a941b6.chunk.js.map": "/sqlite-browser/static/js/3.a0a941b6.chunk.js.map",
+    "index.html": "/sqlite-browser/index.html",
+    "static/css/2.8c0e6b67.chunk.css.map": "/sqlite-browser/static/css/2.8c0e6b67.chunk.css.map",
+    "static/css/main.9e53b558.chunk.css.map": "/sqlite-browser/static/css/main.9e53b558.chunk.css.map",
+    "static/js/2.27ca0054.chunk.js.LICENSE.txt": "/sqlite-browser/static/js/2.27ca0054.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.3aa61d16.js",
+    "static/css/2.8c0e6b67.chunk.css",
+    "static/js/2.27ca0054.chunk.js",
+    "static/css/main.9e53b558.chunk.css",
+    "static/js/main.1fd7ca9f.chunk.js"
+  ]
+}
