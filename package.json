@@ -2,6 +2,7 @@
   "name": "sqlite-browser",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://socialgouv.github.io/sqlite-browser",
   "scripts": {
     "start": "craco start",
     "build": "craco build",

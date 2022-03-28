@@ -1,0 +1,35 @@
+name: Demo
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  demo:
+    name: Demo
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Node setup
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - name: Yarn cache setup
+        uses: c-hive/gha-yarn-cache@v1
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile --prefer-offline
+
+      - name: Build demo
+        run: yarn build
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.0
+        with:
+          branch: gh-pages
+          folder: build
