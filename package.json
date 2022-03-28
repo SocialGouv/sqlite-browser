@@ -1,5 +1,5 @@
 {
-  "name": "sqlite-browser",
+  "name": "@socialgouv/sqlite-browser",
   "description": "Explore sqlite files from your browser",
   "version": "0.1.0",
   "private": true,
