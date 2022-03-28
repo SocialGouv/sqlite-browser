@@ -1,3 +1,7 @@
 # sqlite-browser
 
-Inspect your SQLite files
+Inspect SQLite files from your browser
+
+## Related
+
+- sql.js
