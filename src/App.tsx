@@ -1,6 +1,6 @@
 import { useCallback, useState, useMemo } from "react";
 import { Alert, Container } from "react-bootstrap";
-
+import GitHubForkRibbon from "react-github-fork-ribbon";
 import { useDropzone } from "react-dropzone";
 
 import { Database } from "./sqlite/Database";
@@ -130,6 +130,13 @@ function App() {
 
   return (
     <Container fluid>
+      <GitHubForkRibbon
+        href="https://github.com/SocialGouv/sqlite-browser"
+        target="_blank"
+        position="right"
+      >
+        Code source
+      </GitHubForkRibbon>
       <Alert style={{ marginTop: 20, textAlign: "center" }}>
         <h1>sqlite-browser</h1>
         <p>Explorez vos données SQLite</p>
